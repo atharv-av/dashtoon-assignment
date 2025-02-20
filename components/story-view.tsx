@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect, useCallback } from "react"
 import type { Show } from "@/@types/comic"
 import { Button } from "@/components/ui/button"
@@ -27,8 +26,8 @@ const StoryView: React.FC<StoryViewProps> = ({
 }) => {
   const [currentEpisodeIndex, setCurrentEpisodeIndex] = useState(0)
   const [currentPanelIndex, setCurrentPanelIndex] = useState(initialPanelIndex)
-  const [touchStart, setTouchStart] = useState(0)
-  const [touchEnd, setTouchEnd] = useState(0)
+  const [touchStart, setTouchStart] = useState({ x: 0, y: 0 })
+  const [touchEnd, setTouchEnd] = useState({ x: 0, y: 0 })
 
   const currentEpisode = story.episodes[currentEpisodeIndex]
   const totalPanels = currentEpisode.panels.length
@@ -45,28 +44,73 @@ const StoryView: React.FC<StoryViewProps> = ({
 
   // Initialize panel index when story changes
   useEffect(() => {
-    handlePanelIndexChange(initialPanelIndex)
-  }, [initialPanelIndex, handlePanelIndexChange])
+    if (currentPanelIndex !== initialPanelIndex) {
+      handlePanelIndexChange(initialPanelIndex)
+    }
+  }, [initialPanelIndex, handlePanelIndexChange, currentPanelIndex])
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientY)
+    setTouchStart({
+      x: e.targetTouches[0].clientX,
+      y: e.targetTouches[0].clientY
+    })
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientY)
+    setTouchEnd({
+      x: e.targetTouches[0].clientX,
+      y: e.targetTouches[0].clientY
+    })
   }
 
   const handleTouchEnd = () => {
-    const distance = touchStart - touchEnd
-    const isSwipeDown = distance < -50
-    const isSwipeUp = distance > 50
+    const verticalDistance = touchStart.y - touchEnd.y
+    const horizontalDistance = touchStart.x - touchEnd.x
+    const isVerticalSwipe = Math.abs(verticalDistance) > Math.abs(horizontalDistance)
 
-    if (isSwipeUp && currentPanelIndex < totalPanels - 1) {
-      handlePanelIndexChange(currentPanelIndex + 1)
-    } else if (isSwipeDown && currentPanelIndex > 0) {
-      handlePanelIndexChange(currentPanelIndex - 1)
+    if (isVerticalSwipe) {
+      // Vertical swipe for panel navigation
+      const isSwipeDown = verticalDistance < -50
+      const isSwipeUp = verticalDistance > 50
+
+      if (isSwipeUp && currentPanelIndex < totalPanels - 1) {
+        handlePanelIndexChange(currentPanelIndex + 1)
+      } else if (isSwipeDown && currentPanelIndex > 0) {
+        handlePanelIndexChange(currentPanelIndex - 1)
+      }
+    } else {
+      // Horizontal swipe for story navigation
+      const isSwipeLeft = horizontalDistance > 50
+      const isSwipeRight = horizontalDistance < -50
+
+      if (isSwipeLeft) {
+        onNextStory()
+      } else if (isSwipeRight) {
+        onPrevStory()
+      }
     }
   }
+
+  // Handle mouse wheel/scroll events
+  const handleWheel = useCallback((e: WheelEvent) => {
+    const isHorizontalScroll = Math.abs(e.deltaX) > Math.abs(e.deltaY)
+
+    if (isHorizontalScroll) {
+      // Horizontal scroll for story navigation
+      if (e.deltaX > 50) {
+        onNextStory()
+      } else if (e.deltaX < -50) {
+        onPrevStory()
+      }
+    } else {
+      // Vertical scroll for panel navigation
+      if (e.deltaY > 50 && currentPanelIndex < totalPanels - 1) {
+        handlePanelIndexChange(currentPanelIndex + 1)
+      } else if (e.deltaY < -50 && currentPanelIndex > 0) {
+        handlePanelIndexChange(currentPanelIndex - 1)
+      }
+    }
+  }, [currentPanelIndex, totalPanels, onNextStory, onPrevStory, handlePanelIndexChange])
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -81,9 +125,15 @@ const StoryView: React.FC<StoryViewProps> = ({
       }
     }
 
+    // Add both keyboard and wheel event listeners
     window.addEventListener("keydown", handleKeyPress)
-    return () => window.removeEventListener("keydown", handleKeyPress)
-  }, [currentPanelIndex, totalPanels, onNextStory, onPrevStory, handlePanelIndexChange])
+    window.addEventListener("wheel", handleWheel)
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress)
+      window.removeEventListener("wheel", handleWheel)
+    }
+  }, [currentPanelIndex, totalPanels, onNextStory, onPrevStory, handlePanelIndexChange, handleWheel])
 
   return (
     <div className="h-screen flex flex-col bg-gray-900">
@@ -119,8 +169,8 @@ const StoryView: React.FC<StoryViewProps> = ({
 
         <div className="relative w-full h-full flex items-center justify-center p-4 md:p-8">
           <img
-            key={currentPanel.id}
-            src={currentPanel.imageUrl || "/placeholder.svg"}
+            key={currentPanel?.id}
+            src={currentPanel?.imageUrl || "/placeholder.svg"}
             alt={`Panel ${currentPanelIndex + 1}`}
             className={cn(
               "max-w-full max-h-[calc(100vh-8rem)] object-contain transition-opacity duration-300",
@@ -160,4 +210,3 @@ const StoryView: React.FC<StoryViewProps> = ({
 }
 
 export default StoryView
-
