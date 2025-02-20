@@ -170,7 +170,7 @@ const StoryView: React.FC<StoryViewProps> = ({
         <div className="relative w-full h-full flex items-center justify-center p-4 md:p-8">
           <img
             key={currentPanel?.id}
-            src={currentPanel?.imageUrl || "/placeholder.svg"}
+            src={currentPanel?.imageUrl}
             alt={`Panel ${currentPanelIndex + 1}`}
             className={cn(
               "max-w-full max-h-[calc(100vh-8rem)] object-contain transition-opacity duration-300",

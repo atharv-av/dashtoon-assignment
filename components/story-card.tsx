@@ -22,16 +22,12 @@ const StoryCard: React.FC<StoryCardProps> = ({ show, onClick, isActive }) => {
     >
       <CardHeader className="relative p-0">
         <img
-          src={
-            show.episodes.length > 0
-              ? show.episodes[0].panels[0].imageUrl
-              : "/placeholder.svg?height=200&width=400"
-          }
-          alt={show.name}
+          src={show?.episodes[0]?.panels[0]?.imageUrl}
+          alt={show?.name}
           className="w-full h-48 object-cover rounded-t-lg"
         />
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent p-4">
-          <CardTitle className="text-gray-100">{show.name}</CardTitle>
+          <CardTitle className="text-gray-100">{show?.name}</CardTitle>
         </div>
       </CardHeader>
       <CardContent className="p-4">
