@@ -139,7 +139,7 @@ const StoryView: React.FC<StoryViewProps> = ({
     <div className="h-screen flex flex-col bg-gray-900">
       <div className="flex justify-between items-center p-4 bg-gray-800/50 backdrop-blur-sm fixed top-0 left-0 right-0 z-10">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={onShowList}>
+          <Button variant="ghost" size="icon" className="text-white hover:text-black" onClick={onShowList}>
             <Menu className="h-6 w-6" />
           </Button>
           <h1 className="text-xl font-bold text-white">{story.name}</h1>
@@ -158,7 +158,7 @@ const StoryView: React.FC<StoryViewProps> = ({
         <Button
           variant="ghost"
           size="icon"
-          className="fixed left-4 top-1/2 -translate-y-1/2 bg-gray-800/50 backdrop-blur-sm z-10"
+          className="fixed left-4 top-1/2 -translate-y-1/2 bg-white backdrop-blur-sm z-10"
           onClick={(e) => {
             e.stopPropagation()
             onPrevStory()
@@ -187,7 +187,7 @@ const StoryView: React.FC<StoryViewProps> = ({
         <Button
           variant="ghost"
           size="icon"
-          className="fixed right-4 top-1/2 -translate-y-1/2 bg-gray-800/50 backdrop-blur-sm z-10"
+          className="fixed right-4 top-1/2 -translate-y-1/2 bg-white backdrop-blur-sm z-10"
           onClick={(e) => {
             e.stopPropagation()
             onNextStory()

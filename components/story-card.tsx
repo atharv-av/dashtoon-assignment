@@ -1,13 +1,13 @@
-import type React from "react"
-import type { Show } from "@/@types/comic"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
+import type React from "react";
+import type { Show } from "@/@types/comic";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface StoryCardProps {
-  show: Show
-  onClick: () => void
-  isActive?: boolean
+  show: Show;
+  onClick: () => void;
+  isActive?: boolean;
 }
 
 const StoryCard: React.FC<StoryCardProps> = ({ show, onClick, isActive }) => {
@@ -15,13 +15,17 @@ const StoryCard: React.FC<StoryCardProps> = ({ show, onClick, isActive }) => {
     <Card
       className={cn(
         "bg-gray-800 border-gray-700 hover:border-purple-500 cursor-pointer transition-all",
-        isActive && "border-purple-500",
+        isActive && "border-purple-500"
       )}
       onClick={onClick}
     >
       <CardHeader className="relative p-0">
         <img
-          src={show.thumbNailUrl || "/placeholder.svg?height=200&width=400"}
+          src={
+            show.episodes.length > 0
+              ? show.episodes[0].panels[0].imageUrl
+              : "/placeholder.svg?height=200&width=400"
+          }
           alt={show.name}
           className="w-full h-48 object-cover rounded-t-lg"
         />
@@ -38,8 +42,7 @@ const StoryCard: React.FC<StoryCardProps> = ({ show, onClick, isActive }) => {
         <div className="mt-2 text-sm text-gray-500">by {show.creator}</div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default StoryCard
-
+export default StoryCard;
